@@ -5,4 +5,5 @@ class Request(BaseModel):
     time: str
 
 class Response(BaseModel):
-    response: str
+    entities: list[str]
+

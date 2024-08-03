@@ -179,7 +179,6 @@ mask = mask.to(device)
 targets = targets.to(device)
 outputs = model(input_ids=ids, attention_mask=mask, labels=targets)
 initial_loss = outputs[0]
-initial_loss
 
 optimizer = torch.optim.Adam(params=model.parameters(), lr=LEARNING_RATE)
 
