@@ -1,0 +1,13 @@
+pandas
+scikit-learn
+transformers
+seaborn
+matplotlib
+tweepy
+tweepy[async]
+nltk
+scapy
+spacy
+spacy[transformers,lookups]
+selenium
+python-dotenv

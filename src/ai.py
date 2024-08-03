@@ -1,0 +1,3 @@
+class AIModal:
+    pass
+    
