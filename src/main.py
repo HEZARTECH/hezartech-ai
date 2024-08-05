@@ -1,23 +1,23 @@
-from fastapi import FastAPI, Request, HTTPException, Form
+from fastapi import FastAPI, Request, HTTPException, Form, Body
 from fastapi.responses import HTMLResponse, JSONResponse
-
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
+
+from pydantic import BaseModel, Field
 
 from datetime import datetime, UTC
 import certifi
 import os
 import uuid
 
+from typing import Annotated
+
 import pymongo as pg
 
 __import__('dotenv').load_dotenv()
 
-# other file we are prepared for backend and ml model interaction
-# @NOTE: from ai import sentiment_analysis # we use like that in our real code.
-# But we can use a placholder like this
-def sentiment_analysis(text: str = "Turkcell çok iyi. TurkTelekom tam bir rezaletti. Ama iyi ki değiştirdim.") -> dict[str, list[dict[str,str]]]:
-    return dict({
+def sentiment_analysis(text: str) -> dict[str, list[dict[str,str]]]:
+    return {
         'entity_list': ['Turkcell', 'TurkTelekom'],
         'results': [
             {
@@ -29,18 +29,26 @@ def sentiment_analysis(text: str = "Turkcell çok iyi. TurkTelekom tam bir rezal
                 'sentiment': 'Olumsuz'
             }
         ]
-    })
+    }
 
-slash = '/'
-if os.name == 'nt':
-    slash = '\\'
+slash = '/' if os.name != 'nt' else '\\'
 
 app = FastAPI(title='HEZARTECH.AI')
 
 app.mount("/static", StaticFiles(directory="static"), name="static")
 templates = Jinja2Templates(directory="templates")
 
-@app.post('/predict')
+class TextRequestModel(BaseModel):
+    text: str = Field(..., example="Turkcell çok iyi. TurkTelekom tam bir rezalet. İyi ki değiştirmişim.")
+
+class SentimentResponseModel(BaseModel, JSONResponse):
+    entity_list: list[str] = Field(..., example=['Turkcell', 'TurkTelekom'])
+    results: list[dict[str, str]] = Field(..., example=[
+        {'entity': 'Turkcell', 'sentiment': 'Olumlu'},
+        {'entity': 'TurkTelekom', 'sentiment': 'Olumsuz'}
+    ])
+
+@app.post('/predict', response_model=SentimentResponseModel, summary="Predict sentiment for a given text. (For just backend usage.)", description="Accepts a JSON payload with a `text` field and returns sentiment analysis results.")
 async def predict(request: Request):
     try:
         _input = await request.json()
@@ -64,26 +72,27 @@ async def predict(request: Request):
         return JSONResponse(status_code=500, detail=str(e))
 
 
-
-@app.post('/result', response_class=HTMLResponse)
+@app.post('/result', response_class=HTMLResponse, summary="Display the result page.", description="Displays a result page with the provided text from index page form input. Predict the result via our model and print it.")
 async def read_result(request: Request, text: str = Form(...)):
     try:
-        return templates.TemplateResponse(
-            "result.html", {"request": request, "text": text}
-        )
-    except Exception as e:
-        raise HTTPException(status_code=5000, detail=str(e))
-
-@app.get("/", response_class=HTMLResponse)
-async def read_index(request: Request):
-    try:
-        return templates.TemplateResponse(
-            name="index.html", context={"request": request}
-        )
+        result = sentiment_analysis(text)
+        return templates.TemplateResponse("result.html", {
+            "request": request,
+            "text": text,
+            "result": result,
+        })
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-# database code
+@app.get("/", response_class=HTMLResponse, summary="Home page", description="Displays the home page.")
+async def read_index(request: Request):
+    try:
+        return templates.TemplateResponse(name="index.html", context={"request": request})
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+# Database Code Section For Saving Data to Retrain our model later.
 client = pg.MongoClient(os.getenv('DB_URI') + '?retryWrites=true&w=majority', tlsCAFile=certifi.where())
 db = client.get_database('hezartech')
 
@@ -92,8 +101,7 @@ def random_id_gen() -> str:
 
 def save_prompt_to_db(_input: str, _response: dict[str, list[dict[str, str]]]) -> bool:
     try:
-        _time: str = datetime.now(UTC).strftime("%m/%d/%Y, %H:%M:%S")
-
+        _time = datetime.now(UTC).strftime("%m/%d/%Y, %H:%M:%S") + 'UTC'
         db.ai.insert_one({
             "_id": random_id_gen(),
             "text": _input,
@@ -101,7 +109,6 @@ def save_prompt_to_db(_input: str, _response: dict[str, list[dict[str, str]]]) -
             'results': _response.get('results'),
             "time": _time
         })
-
         return True
 
     except Exception as e:
