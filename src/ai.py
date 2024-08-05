@@ -1,16 +1,17 @@
-from transformers import pipeline, BertTokenizer, BertForSequenceClassification
+"""from transformers import pipeline, BertTokenizer, BertForSequenceClassification
 import pandas as pd
 
 from torch.utils.data import Dataset
 import torch
 
-device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+device = 'cuda' if torch.cuda.is_available() else 'cpu'
+torch.device(device)
 
-model_name = "berturk-teknofest-tddi-sceneario-finetune"
+model_name: str = "berturk-teknofest-tddi-sceneario-finetune"
 
-df = pd.read_csv('../model/dataset.csv')
+df: pd.DataFrame = pd.read_csv('../model/dataset.csv')
 
-label_mapping = {
+label_mapping: dict[str | None, int] = {
     None: 0,
     "positive": 1,
     "negative": 2,
@@ -20,8 +21,8 @@ label_mapping = {
 # Etiketleri güncelle
 df['label'] = df['value'].map({
     1: 'positive',
-    2: 'negative',
     3: 'positive|negative',
+    2: 'negative',
 })
 
 # Sadece gerekli sütunları tutun
@@ -58,3 +59,21 @@ def get_sentiment(text):
         return 'Olumlu'
     elif prediction == None:
         return 'Tarafsiz'
+"""
+"""
+def sentiment_analysis(text: str = "Turkcell çok iyi. TurkTelekom tam bir rezaletti. Ama iyi ki değiştirdim."):
+    return {
+        'entity_list': ['Turkcell', 'TurkTelekom'],
+        'results': [
+            {
+                'entity': 'Turkcell',
+                'sentiment': 'Olumlu'
+            },
+            {
+                'entity': 'TurkTelekom',
+                'sentiment': 'Olumsuz'
+            }
+        ]
+    }
+
+"""

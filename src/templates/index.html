@@ -1,40 +1,208 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="tr">
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Styled Form</title>
-    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@3.0.24/dist/tailwind.min.css" rel="stylesheet">
-</head>
-<body class="bg-gray-100 flex items-center justify-center min-h-screen">
+    <title>HEZARTECH.AI</title>
+    <link rel="icon" type="image/png" href="/static/HEZARTECH.png">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.0.2/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap"
+        rel="stylesheet">
+    <style>
+        .poppins-thin {
+            font-family: "Poppins", sans-serif;
+            font-weight: 100;
+            font-style: normal;
+        }
 
-    <div class="bg-white p-8 rounded-lg shadow-lg max-w-md w-full">
-        <h2 class="text-2xl font-bold mb-6 text-gray-800">Contact Us</h2>
-        <form action="#" method="POST" class="space-y-4">
-            <div>
-                <label for="name" class="block text-sm font-medium text-gray-700">Name</label>
-                <input type="text" id="name" name="name" required
-                       class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+        .poppins-extralight {
+            font-family: "Poppins", sans-serif;
+            font-weight: 200;
+            font-style: normal;
+        }
+
+        .poppins-light {
+            font-family: "Poppins", sans-serif;
+            font-weight: 300;
+            font-style: normal;
+        }
+
+        .poppins-regular {
+            font-family: "Poppins", sans-serif;
+            font-weight: 400;
+            font-style: normal;
+        }
+
+        .poppins-medium {
+            font-family: "Poppins", sans-serif;
+            font-weight: 500;
+            font-style: normal;
+        }
+
+        .poppins-semibold {
+            font-family: "Poppins", sans-serif;
+            font-weight: 600;
+            font-style: normal;
+        }
+
+        .poppins-bold {
+            font-family: "Poppins", sans-serif;
+            font-weight: 700;
+            font-style: normal;
+        }
+
+        .poppins-extrabold {
+            font-family: "Poppins", sans-serif;
+            font-weight: 800;
+            font-style: normal;
+        }
+
+        .poppins-black {
+            font-family: "Poppins", sans-serif;
+            font-weight: 900;
+            font-style: normal;
+        }
+
+        .poppins-thin-italic {
+            font-family: "Poppins", sans-serif;
+            font-weight: 100;
+            font-style: italic;
+        }
+
+        .poppins-extralight-italic {
+            font-family: "Poppins", sans-serif;
+            font-weight: 200;
+            font-style: italic;
+        }
+
+        .poppins-light-italic {
+            font-family: "Poppins", sans-serif;
+            font-weight: 300;
+            font-style: italic;
+        }
+
+        .poppins-regular-italic {
+            font-family: "Poppins", sans-serif;
+            font-weight: 400;
+            font-style: italic;
+        }
+
+        .poppins-medium-italic {
+            font-family: "Poppins", sans-serif;
+            font-weight: 500;
+            font-style: italic;
+        }
+
+        .poppins-semibold-italic {
+            font-family: "Poppins", sans-serif;
+            font-weight: 600;
+            font-style: italic;
+        }
+
+        .poppins-bold-italic {
+            font-family: "Poppins", sans-serif;
+            font-weight: 700;
+            font-style: italic;
+        }
+
+        .poppins-extrabold-italic {
+            font-family: "Poppins", sans-serif;
+            font-weight: 800;
+            font-style: italic;
+        }
+
+        .poppins-black-italic {
+            font-family: "Poppins", sans-serif;
+            font-weight: 900;
+            font-style: italic;
+        }
+    </style>
+    <style>
+        html { height: 100%;}
+        body { background: linear-gradient(#0a2904, #42a82d); }
+        .auto-resize {
+            transition: height 0.2s;
+        }
+
+        .form-container {
+            transition: height 0.2s, padding 0.2s;
+        }
+    </style>
+</head>
+
+<body>
+    <section class="content">
+        <header>
+            <nav class="bg-gray-800 pt-4" style="height: 8vh;">
+                <div class="!max-w-7xl !mx-auto px-4 !sm:px-6 !lg:px-8" style="margin-top: -0.6%;">
+                    <div class="flex items-center justify-between h-16">
+                        <div class="flex items-center h-16">
+                            <div class="hidden md:block">
+                                <div class="ml-10 flex items-start space-x-4">
+                                    <img class="border-1 border-transparent rounded-md cursor-pointer" width="150px"
+                                        height="75px" src="/static/HEZARTECH.png" alt="HEZARTECH"
+                                        class="w-8 h-8" />
+                                    <a href="/" id="homepage"
+                                        style="background-color: gray; font-size: 20px;"
+                                        class="cursor-pointer border-1 border-transparent text-center text-gray-300 text-white px-3 py-2 rounded-md text-sm font-medium">
+                                        HEZARTECH.AI DOĞAL DİL İŞLEME MODELI
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </nav>
+        </header>
+        <article>
+            <div id="form-container" class="form-container bg-white pl-5 pr-5 rounded shadow-md" style="
+                height: 20vh; width: 70vw;
+                position: absolute;
+                left: 15%;
+                top: 30%;
+                ">
+                <h2 class="text-2xl mb-6 text-center">Bir veri gir</h2>
+                <form action="/result" method="post" class="space-y-6">
+                    <div>
+                        <label for="text" class="block text-sm font-medium text-gray-700">Text</label>
+                        <textarea id="text" name="text" rows="4" required class="mt-1 p-2 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                        style="width: 100%;"
+                        placeholder="Lütfen bir girdi verin. Ör: Turkcell çok iyi. **** (başka bir şirket) çok kötü."
+                        ></textarea>
+                    </div>
+                    <div>
+                        <button type="submit"
+                        class="
+                            w-full py-2 px-4 bg-indigo-600 text-white rounded-md hover:bg-indigo-700
+                            focus:outline-none focus:ring-2 focus:ring-indigo-500
+                        ">
+                            Gönder.
+                        </button>
+                    </div>
+                </form>
             </div>
-            <div>
-                <label for="email" class="block text-sm font-medium text-gray-700">Email</label>
-                <input type="email" id="email" name="email" required
-                       class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
-            </div>
-            <div>
-                <label for="message" class="block text-sm font-medium text-gray-700">Message</label>
-                <textarea id="message" name="message" rows="4" required
-                          class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"></textarea>
-            </div>
-            <div>
-                <button type="submit"
-                        class="w-full bg-indigo-600 text-white py-2 px-4 rounded-md shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
-                    Submit
-                </button>
-            </div>
-        </form>
-    </div>
-<script src="/static/index.js"></script>
+        </article>
+    </section>
+<script>
+const formContainer = document.getElementById('form-container');
+const textarea = document.getElementById('text');
+function autoResize(textarea) {
+    textarea.style.height = 'auto';
+    textarea.style.height = textarea.scrollHeight + 'px';
+
+    formContainer.style.height = formContainer.scrollHeight + 'px';
+}
+
+// Initialize the form container height based on the initial content
+window.addEventListener('load', () => {
+    autoResize(formContainer);
+});
+</script>
 </body>
 </html>

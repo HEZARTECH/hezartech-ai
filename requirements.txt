@@ -1,13 +1,8 @@
 pandas
+numpy
 scikit-learn
+datasets
 transformers
-seaborn
-matplotlib
-tweepy
-tweepy[async]
-nltk
-scapy
-spacy
-spacy[transformers,lookups]
-selenium
 python-dotenv
+fastapi[standard]
+starlette

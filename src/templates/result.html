@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HEZARTECH.AI</title>
+    <link rel="icon" type="image/png" href="/static/HEZARTECH.png">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.0.2/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap"
+        rel="stylesheet">
+    <style>
+        .poppins-regular {
+            font-family: "Poppins", sans-serif;
+            font-weight: 400;
+            font-style: normal;
+        }
+
+        .poppins-medium {
+            font-family: "Poppins", sans-serif;
+            font-weight: 500;
+            font-style: normal;
+        }
+    </style>
+    <style>
+        html { height: 100%;}
+        body { background: linear-gradient(#0a2904, #42a82d); }
+        .auto-resize {
+            transition: height 0.2s;
+        }
+
+        .form-container {
+            transition: height 0.2s, padding 0.2s;
+        }
+    </style>
+</head>
+<body>
+<section class="content">
+<header>
+    <nav class="bg-gray-800 pt-4" style="height: 8vh;">
+        <div class="!max-w-7xl !mx-auto px-4 !sm:px-6 !lg:px-8" style="margin-top: -0.6%;">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center h-16">
+                    <div class="hidden md:block">
+                        <div class="ml-10 flex items-start space-x-4">
+                            <img class="border-1 border-transparent rounded-md cursor-pointer" width="150px"
+                                height="75px" src="/static/HEZARTECH.png" alt="HEZARTECH"
+                                class="w-8 h-8" />
+                            <a href="/" id="homepage"
+                                style="background-color: gray; font-size: 20px;"
+                                class="poppins-regular cursor-pointer border-1 border-transparent text-center text-gray-300 text-white px-3 py-2 rounded-md text-sm font-medium">
+                                HEZARTECH.AI DOĞAL DİL İŞLEME MODELI
+                            </a>2
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+</header>
+<article>
+    <div class="bg-white p-8 rounded shadow-md w-full max-w-md">
+        <h2 class="text-2xl mb-6 text-center">Girdiğin:</h2>
+        <p class="text-lg text-gray-800 whitespace-pre-line">{{ text }}</p>
+        <div class="mt-6">
+            <a href="/" class="block text-center py-2 px-4 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                &larr; Ana sayfaya git.
+            </a>
+        </div>
+    </div>
+</article>
+</section>
+</body>
+</html>
