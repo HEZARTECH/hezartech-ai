@@ -16,8 +16,8 @@ import zeyrek
 
 
 analyzer = zeyrek.MorphAnalyzer()
-cumle = 'Selam canım naber ama ama kötüsün sanırım'
-print(analyzer.analyze(cumle))
+kelime = 'ama'
+print(analyzer.analyze(kelime))
 
 # Firma tespiti için modeli yükleme (Named Entity Recognition)
 ner_recognizer = SequenceTagger.load('flair/ner-english-large')
