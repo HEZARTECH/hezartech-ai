@@ -6,18 +6,14 @@
 @date: 2024-08-06 13:33:16
 """
 from nltk.tokenize import sent_tokenize # Sentence splitter/tokenizer.
+from nltk.tokenize import word_tokenize # Word tokenizer.
 from transformers import pipeline
 
 from flair.data import Sentence
 from flair.models import SequenceTagger
 
+# Noktalama işaretleri tokenizer modellerinin indiğinden emin oluyoruz.
 import nltk; nltk.download('punkt', quiet=True)
-import zeyrek
-
-
-analyzer = zeyrek.MorphAnalyzer()
-kelime = 'ama'
-print(analyzer.analyze(kelime))
 
 # Firma tespiti için modeli yükleme (Named Entity Recognition)
 ner_recognizer = SequenceTagger.load('flair/ner-english-large')
@@ -36,22 +32,44 @@ def get_sentiment(text):
     elif prediction == None:
         return 'Tarafsiz'
 
-def seperate_sentences_via_stopwords(sentence: str) -> list[str]:
-    analyzer = zeyrek.MorphAnalyzer()
-    conjuctions_in_sentence = []
+def remove_word(sentence, word):
+    words = word_tokenize(sentence)
+    filtered_words = [w for w in words if w != word]
+    return " ".join(filtered_words)
 
-    for parsed_words in analyzer.analyze(sentence):
-        for formatted in parsed_words:
-            if formatted == 'Conj':
-                conjuctions_in_sentence.append(formatted)
+def separate_sentences_via_conjunctions(sentence: str) -> list[str]:
+    words: list[str] = word_tokenize(sentence)
 
-    conjuctions_in_sentence = list(set(conjuctions_in_sentence))
+    negative_conjunctions: list[str] = [
+        "ama", "fakat", "lakin",
+        "ancak", "oysa", "halbuki",
+        "gerçi"
+    ]
 
-    #@TODO: bulduğun bağlaçları import et
-    #@TODO: Implement here.
-    return ""
+    split_sentences = []
+    current_sentence = []
 
-def analyze(comment: str):
+    for word in words:
+        if word in negative_conjunctions:
+            split_sentences.append(" ".join(current_sentence))
+            current_sentence = []
+        current_sentence.append(word)
+
+    if current_sentence:
+        split_sentences.append(" ".join(current_sentence))
+
+    filtered_split_sentences: list[str] = []
+
+    for _sentence in split_sentences:
+        for conjunction in negative_conjunctions:
+            if conjunction in _sentence:
+                _sentence = remove_word(_sentence, conjunction)
+        filtered_split_sentences.append(_sentence.strip())
+
+    return filtered_split_sentences
+
+
+def absa_analyzer(comment: str): # Aspect-Based Sentiment Analyzer
     sentence = Sentence(comment)
     ner_recognizer.predict(sentence)
 
@@ -77,7 +95,7 @@ def analyze(comment: str):
     # Duygu analizi ve etiketleme
     results = []
     for sentence in sentences:
-        internal_sentences = seperate_sentences_via_stopwords(sentences)
+        internal_sentences = separate_sentences_via_conjunctions(sentences)
 
         for internal_of_internal_sentences in internal_sentences:
             for firm in firms:
