@@ -6,3 +6,5 @@ transformers
 python-dotenv
 fastapi[standard]
 starlette
+flair
+nltk
