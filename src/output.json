@@ -1,11 +1,11 @@
 {
     "entity_list": [
-        "TürkTelekom"
+        "Turkcell"
     ],
     "results": [
         {
-            "entity": "TürkTelekom",
-            "sentiment": "Olumsuz"
+            "entity": "Turkcell",
+            "sentiment": "Olumlu"
         }
     ]
 }
