@@ -212,6 +212,7 @@ def analyze_sentences(sentences: list[str], text: str):
     """
 
     firm_list = []
+    global inside_sentences
     pattern = r'@(\w+(\_\w+)*)'
     matches = re.findall(pattern, text)
     result = [match[0] for match in matches]
@@ -221,6 +222,7 @@ def analyze_sentences(sentences: list[str], text: str):
             firm_list.append(j)
     for sentence in sentences:
         all_entities = []
+        firms = []
         firmcount = 0
         text = Sentence(sentence)
         ner_recognizer.predict(text)
@@ -247,16 +249,33 @@ def analyze_sentences(sentences: list[str], text: str):
         else:
             inside_sentences = separate_sentences_via_conjunctions(sentence)
             if len(inside_sentences) == 1:
-                for _sentence in inside_sentences:
-                    for firm in firm_list:
-                        if firm in _sentence:
-                            sentiment = sentiment_analyzer(_sentence, firm)
+                if "," in inside_sentences[0]:
+                    inside_sentences = inside_sentences[0].split(",")
+                    for i in inside_sentences :
+                        for firm in firm_list:
+                            if firm in i:
+                                sentiton = sentiment_analysis(inside_sentences[0])[0]['label']
+                                if sentiton == "LABEL_0":
+                                  print(inside_sentences)
+                                  inside_sent = "".join(inside_sentences)
+                                  sentiment = sentiment_analyzer(inside_sent, firm)
+                                else:
+                                  sentiment = sentiment_analyzer(i, firm)
+
+                else:
+                  inside_sentences = separate_sentences_via_conjunctions(sentence)
+                  if len(inside_sentences) == 1:
+                      for _sentence in inside_sentences:
+                         for firm in firm_list:
+                            if firm in _sentence:
+                              sentiment = sentiment_analyzer(_sentence, firm)
+
+
             else:
               for i in inside_sentences :
                 for _sentence in inside_sentences:
                     for firm in firm_list:
                         if firm in _sentence:
-                          print(_sentence)
                           sentiment = sentiment_analyzer(_sentence, firm)
 
     unique_results = list(OrderedDict.fromkeys(tuple(sorted(d.items())) for d in results))
