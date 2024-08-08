@@ -256,7 +256,6 @@ def analyze_sentences(sentences: list[str], text: str):
                             if firm in i:
                                 sentiton = sentiment_analysis(inside_sentences[0])[0]['label']
                                 if sentiton == "LABEL_0":
-                                  print(inside_sentences)
                                   inside_sent = "".join(inside_sentences)
                                   sentiment = sentiment_analyzer(inside_sent, firm)
                                 else:
@@ -272,11 +271,19 @@ def analyze_sentences(sentences: list[str], text: str):
 
 
             else:
-              for i in inside_sentences :
+                temp_results = {}
                 for _sentence in inside_sentences:
+                  x = 0
+                  for firm in firm_list:
+                    if firm not in _sentence:
+                      continue
+                    else:
+                      sentiment = sentiment_analyzer(_sentence, firm)
+                      x += 1
+                  if x == 0:
                     for firm in firm_list:
-                        if firm in _sentence:
-                          sentiment = sentiment_analyzer(_sentence, firm)
+                      _return = " ".join(inside_sentences)
+                      sentiment = sentiment_analyzer(_return, firm)
 
     unique_results = list(OrderedDict.fromkeys(tuple(sorted(d.items())) for d in results))
     unique_dict_results = [dict(t) for t in unique_results]

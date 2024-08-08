@@ -1,11 +1,15 @@
 {
     "entity_list": [
-        "AdemÜnlü"
+        "BilişimVadisi"
     ],
     "results": [
         {
-            "entity": "AdemÜnlü",
+            "entity": "BilişimVadisi",
             "sentiment": "Olumlu"
+        },
+        {
+            "entity": "BilişimVadisi",
+            "sentiment": "Olumsuz"
         }
     ]
 }
