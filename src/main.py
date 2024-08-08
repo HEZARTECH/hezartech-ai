@@ -65,6 +65,14 @@ class SentimentResponseModel(BaseModel, JSONResponse):
 
 @app.post('/predict', response_model=SentimentResponseModel, summary="Predict sentiment for a given text. (For just backend usage.)", description="Accepts a JSON payload with a `text` field and returns sentiment analysis results.")
 async def predict(request: Request):
+    '''
+        Bu fonksiyon cURL ya da herhangi bir client ile bağlanıp verileri
+        json formatında isteyip döndürmek için kullanılıyor.
+
+        Usage:
+            curl http://HOST:PORT/predict -H Content-Type:application/json -d "{\"text\": \"$INPUT$\"}
+    '''
+
     try:
         _input = await request.json()
 
@@ -87,6 +95,10 @@ async def predict(request: Request):
         return JSONResponse(status_code=500, content=str(e))
 
 async def result_predict(text: str) -> dict[str, list[dict[str, str]]]:
+    '''
+        Bu fonksiyon /result endpoint'i için yapay zeka ile haberleşen bir fonksiyondur
+    '''
+
     result = sentiment_analysis(text)
     print(result)
     is_passed: bool = save_prompt_to_db(text, result)
@@ -98,6 +110,11 @@ async def result_predict(text: str) -> dict[str, list[dict[str, str]]]:
 
 @app.post('/result', response_class=HTMLResponse, summary="Display the result page.", description="Displays a result page with the provided text from index page form input. Predict the result via our model and print it.")
 async def read_result(request: Request, text: str = Form(...)):
+    '''
+        Bu fonksiyon `/` endpoint'indeki girdiyi yapay zeka ile analiz edip döndürmek için
+        kullanılıyor. Aynı zamanda bir arayüz ile tek tek duygu-firma eşleşmelerini görüntülemek için
+        kullanılıyor.
+    '''
     try:
         results = sentiment_analysis(text)['results']
         print(results)
@@ -112,6 +129,9 @@ async def read_result(request: Request, text: str = Form(...)):
 
 @app.get("/", response_class=HTMLResponse, summary="Home page", description="Displays the home page.")
 async def read_index(request: Request):
+    '''
+        Ana sayfa. (Bir girdi ile sorgu yapmak için kullanılıyor.)
+    '''
     try:
         return templates.TemplateResponse(name="index.html", context={"request": request})
 

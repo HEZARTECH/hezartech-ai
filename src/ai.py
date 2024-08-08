@@ -17,6 +17,8 @@ import re
 from collections import OrderedDict
 import json
 
+from typing import Any
+
 # Noktalama işaretleri tokenizer fonksiyonlarının import edildiğinden emin oluyoruz.
 from nltk.tokenize import sent_tokenize, word_tokenize
 import nltk; nltk.download('punkt', quiet=True)
@@ -46,18 +48,29 @@ label_mapping: dict[int, str] = {
     3: "positive|negative",
 }
 
-# Result Vectors
+# Sonuç Vektörleri
 firm_list: list[str] = []
 results: list[dict[str, str]] = []
 
 ner_recognizer: SequenceTagger = SequenceTagger.load('flair/ner-english-large')
 
-def split_sentences(text: str):
+def split_sentences(text: str) -> list[str]:
+    '''
+        Bu fonksiyon cümleleri ayırmak için kullanılıyor.
+
+        text: str (cümle)
+
+        Returns:
+            list[str]
+    '''
+
     # Cümleleri nokta ve soru işaretleri ile ayırmak
     sentences = sent_tokenize(text, language='turkish')
 
-    # Virgülle ayrılan cümleleri tespit ve ayırmak için bir işlev
     def handle_commas(sentence: str) -> list[str]:
+        '''
+            Virgülle ayrılan cümleleri tespit ve ayırmak için bir işlev
+        '''
         parts = sentence.split(',')
         new_parts = []
         for part in parts:
@@ -77,12 +90,33 @@ def split_sentences(text: str):
 
 sentiment_analysis = pipeline("sentiment-analysis", model=data_path)
 
-def remove_word(sentence, word):
+def remove_word(sentence: str, word: str) -> str:
+    '''
+        Bu fonksiyon cümleden belirli bir kelimeyi silmeye yarıyor.
+        (Bunu gereksiz bağlaçları silmek için kullandık.)
+
+        sentence: str (Cümle)
+        word: str (Cümleden silinecek belirli kelime)
+
+        Returns:
+            str
+    '''
+
     words = word_tokenize(sentence)
     filtered_words = [w for w in words if w != word]
     return " ".join(filtered_words)
 
 def separate_sentences_via_conjunctions(sentence: str) -> list[str]:
+    '''
+        Cümleler alınıp negatif/karşılaştırma bağlaçları sayesinde ayrılıp cümle listelerine dönüştürlüyor.
+        (Firmaları almamızda yardımcı olan bir mekanizma.)
+
+        sentence: str (cümle)
+
+        Returns:
+            list[str] [`sentence` değişkeninin (cümlenin) negatif/karşıt anlam bağlaçları ile ayrılmış versiyonu.]
+    '''
+
     words: list[str] = word_tokenize(sentence)
     negative_conjunctions: list[str] = [
         "ama", "fakat", "lakin",
@@ -114,25 +148,44 @@ def separate_sentences_via_conjunctions(sentence: str) -> list[str]:
 
 
 def reset_result_vectors() -> None:
+    '''
+        Sonuç vektörlerini sıfırlamak için kullanılıyor.
+    '''
     global firm_list, results
     firm_list = []
     results = []
 
 def print_result_vectors():
+    '''
+        Sonuç vektörlerini ekrana bastırmak için kullanılıyor.
+    '''
     __import__('pprint').pprint({
         "entity_list": firm_list,
         "results": results
     })
 
+# Bu değişkenleri (Bu değişkenler asıl kullanılan ve sonuç döndürmede önemli yerler.)
 firm_list = []
 dandan = []
 results = []
 
+def cut_after_apostroph(line: str):
+    '''
+        Bu fonksiyon eklerden sonra gelen kesme işaretlerini ayırmada kullanılıyor.
+        (Firma adını temizlemek için kullanılıyor.)
 
-def cut_after_apostroph(line):
+        line: str (text for remove apostroph)
+
+        Returns:
+            str [RegEx'den dönen yazı(firma) versiyonu]
+    '''
     return re.sub(r"'.*$", "", line)
 
 def sentiment_analyzer(sentence_i: str, firm: str):
+    """
+        Bu fonksiyon duygu analizi hesaplamalarında kullanılıyor.
+    """
+
     firm_list.append(firm)
     sentiment_result = sentiment_analysis(sentence_i)
     sentiment = sentiment_result[0]['label']
@@ -149,7 +202,15 @@ def sentiment_analyzer(sentence_i: str, firm: str):
 
     return sentiment
 
-def analyze_sentences(sentences, text):
+def analyze_sentences(sentences: list[str], text: str):
+    """
+        Bu fonksiyon cümle analizi ve duygu-firma eşleşmesi analizi için kullanılıyor.
+
+        text: str
+        sentences: list[str] (split_sentences(text) 'a denk geliyor)
+
+    """
+
     firm_list = []
     pattern = r'@(\w+(\_\w+)*)'
     matches = re.findall(pattern, text)
@@ -210,7 +271,19 @@ def analyze_sentences(sentences, text):
 
     return response
 
-def make_predict(text: str):
+def make_predict(text: str) -> dict[str, Any]:
+    """
+        Model'den çıktı almak için her şeyi tek fonksiyonda kolaylaştırmak amacıyla
+        oluşturduk.
+
+        text: str
+
+        Returns:
+            dict[str, Any] (Sonuçlar)
+
+        Example:
+        >>> make_predict('Turcell çok iyi bir şirket. İyi ki varsın @Turkcell.')
+    """
     return analyze_sentences(split_sentences(text), text)
 
 if __name__ == '__main__':
