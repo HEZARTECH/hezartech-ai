@@ -14,6 +14,8 @@ from flair.data import Sentence
 from flair.models import SequenceTagger
 
 import re
+from collections import OrderedDict
+import json
 
 # Noktalama işaretleri tokenizer fonksiyonlarının import edildiğinden emin oluyoruz.
 from nltk.tokenize import sent_tokenize, word_tokenize
@@ -23,9 +25,7 @@ import nltk; nltk.download('punkt', quiet=True)
 ner_recognizer = SequenceTagger.load('flair/ner-english-large')
 
 # Duygu analizi için Huggingface transformers modeli yükleme
-sentiment_analysis = pipeline("sentiment-analysis", model="savasy/bert-base-turkish-sentiment-cased")
-
-#data_path = '../model/heartech_ai/'
+data_path = '..\model\hezartech_ai'
 
 # Model ve tokenizer'ı yükle.
 loaded_model = BertForSequenceClassification.from_pretrained(data_path)
@@ -52,25 +52,38 @@ results: list[dict[str, str]] = []
 
 ner_recognizer: SequenceTagger = SequenceTagger.load('flair/ner-english-large')
 
-def print_result_vectors():
-    __import__('pprint').pprint({
-        "entity_list": firm_list,
-        "results": results
-    })
+def split_sentences(text: str):
+    # Cümleleri nokta ve soru işaretleri ile ayırmak
+    sentences = sent_tokenize(text, language='turkish')
 
-def split_sentences(sentence: str) -> list[str]:
-    return sent_tokenize(sentence, language='turkish')
+    # Virgülle ayrılan cümleleri tespit ve ayırmak için bir işlev
+    def handle_commas(sentence: str) -> list[str]:
+        parts = sentence.split(',')
+        new_parts = []
+        for part in parts:
+            if part.strip():
+                new_parts.append(part.strip())
+        return new_parts
+
+
+    # Her bir cümleyi virgülle ayırmak
+    final_sentences = []
+    for sentence in sentences:
+        # Cümleyi virgüllerle ayırmak
+        parts = handle_commas(sentence)
+        final_sentences.extend(parts)
+
+    return final_sentences
 
 sentiment_analysis = pipeline("sentiment-analysis", model=data_path)
 
-def remove_word(sentence: str, word: str) -> str:
+def remove_word(sentence, word):
     words = word_tokenize(sentence)
     filtered_words = [w for w in words if w != word]
     return " ".join(filtered_words)
 
 def separate_sentences_via_conjunctions(sentence: str) -> list[str]:
     words: list[str] = word_tokenize(sentence)
-
     negative_conjunctions: list[str] = [
         "ama", "fakat", "lakin",
         "ancak", "oysa", "halbuki",
@@ -99,41 +112,54 @@ def separate_sentences_via_conjunctions(sentence: str) -> list[str]:
 
     return filtered_split_sentences
 
+
 def reset_result_vectors() -> None:
     global firm_list, results
     firm_list = []
     results = []
 
-def cut_after_apostroph(line: str) -> str:
+def print_result_vectors():
+    __import__('pprint').pprint({
+        "entity_list": firm_list,
+        "results": results
+    })
+
+firm_list = []
+dandan = []
+results = []
+
+
+def cut_after_apostroph(line):
     return re.sub(r"'.*$", "", line)
 
-def sentiment_analyzer(sentence_i: str, firm: str) -> str:
+def sentiment_analyzer(sentence_i: str, firm: str):
     firm_list.append(firm)
-
     sentiment_result = sentiment_analysis(sentence_i)
     sentiment = sentiment_result[0]['label']
 
     if sentiment == "LABEL_1":
-        results.append({"entity": firm, "sentiment": "Pozitif"})
-
+        results.append({"entity": firm, "sentiment": "Olumlu"})
     elif sentiment == "LABEL_0":
         results.append({"entity": firm, "sentiment": "Nötr"})
-
     elif sentiment == "LABEL_2":
-        results.append({"entity": firm, "sentiment": "Negatif"})
-
+        results.append({"entity": firm, "sentiment": "Olumsuz"})
     elif sentiment == "LABEL_3":
-        results.append({"entity": firm, "sentiment": "Pozitif"})
-        results.append({"entity": firm, "sentiment": "Negatif"})
+        results.append({"entity": firm, "sentiment": "Olumlu"})
+        results.append({"entity": firm, "sentiment": "Olumsuz"})
 
     return sentiment
 
-def analyze_sentences(_input: str) -> None:
-    sentences = split_sentences(_input)
-
+def analyze_sentences(sentences, text):
+    firm_list = []
+    pattern = r'@(\w+(\_\w+)*)'
+    matches = re.findall(pattern, text)
+    result = [match[0] for match in matches]
+    dandan.append(result)
+    for i in dandan:
+        for j in i:
+            firm_list.append(j)
     for sentence in sentences:
         all_entities = []
-        firms = []
         firmcount = 0
         text = Sentence(sentence)
         ner_recognizer.predict(text)
@@ -148,46 +174,45 @@ def analyze_sentences(_input: str) -> None:
         for entity in all_entities:
             if entity['type'] == 'ORG':
 
-                firms.append(cut_after_apostroph(entity['entity_name']))
+                firm_list.append(cut_after_apostroph(entity['entity_name']))
                 firmcount += 1
         # Tekrarlayan firma adlarının tek bir tanesini aldı.
-        firms = list(set(firms))
-        firmcount = len(firms)
-
+        firm_list = list(set(firm_list))
+        firmcount = len(firm_list)
         if firmcount == 1:
-            for firm in firms:
+            for firm in firm_list:
                 if firm in sentence:
                     sentiment = sentiment_analyzer(sentence, firm)
-                    print(f"Cümle:{sentence}\nSentiment:{sentiment}")
         else:
-            print("Birden fazla firma adı var. Karşıtlık bağlacı aranacak.")
             inside_sentences = separate_sentences_via_conjunctions(sentence)
             if len(inside_sentences) == 1:
-                print(f"Cümle:{inside_sentences}")
-                print("Cümlede karşıtlık bağlacı yoktur. Bu cümleye sentiment atandı.")
-                for firm in firms:
-                    if firm in inside_sentences[0]:
-                        sentiment = sentiment_analyzer(inside_sentences[0], firm)
-            else:
-                print(f"Cümle:{inside_sentences}")
-                print("Karşıtlık bağlacı bulundu. Bu aralıktan cümle bölündü.")
-
                 for _sentence in inside_sentences:
-                    for firm in firms:
+                    for firm in firm_list:
                         if firm in _sentence:
                             sentiment = sentiment_analyzer(_sentence, firm)
+            else:
+              for i in inside_sentences :
+                for _sentence in inside_sentences:
+                    for firm in firm_list:
+                        if firm in _sentence:
+                          print(_sentence)
+                          sentiment = sentiment_analyzer(_sentence, firm)
 
+    unique_results = list(OrderedDict.fromkeys(tuple(sorted(d.items())) for d in results))
+    unique_dict_results = [dict(t) for t in unique_results]
 
-def make_predict(comment: str) -> None:
-    analyze_sentences(comment)
-    print_result_vectors()
+    response = {"entity_list": firm_list, "results": unique_dict_results}
+    firm_list = []
     reset_result_vectors()
+
+    with open('output.json', 'w', encoding='utf-8') as json_file:
+        json.dump(response, json_file, ensure_ascii=False, indent=4)
+
+    return response
+
+def make_predict(text: str):
+    return analyze_sentences(split_sentences(text), text)
 
 if __name__ == '__main__':
-    # Örnek yorum
-    comment = "@TurkcellHizmet ya vereceÄŸiniz hizmeti... ya bilader adada bile iyi Ã§ekerken, ÅŸehir merkezinde nasÄ±l Ã§ekmiyor bu"
-
-    analyze_sentences(comment)
-    print_result_vectors()
-    reset_result_vectors()
-
+    while True:
+        print(make_predict(input("Input: ")))

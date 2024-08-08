@@ -18,20 +18,17 @@ import certifi
 import os
 import uuid
 
-'''
 from ai import (
-    analyze_sentences,
-    reset_result_vectors,
-    firm_list, results
+    make_predict
 )
-'''
 
 import pymongo as pg
 
 __import__('dotenv').load_dotenv()
 
 def sentiment_analysis(text: str) -> dict[str, list[dict[str,str]]]:
-    return {
+    return make_predict(text)
+    '''{
         'entity_list': ['Turkcell', 'TurkTelekom', 'Bilişim Vadisi'],
         'results': [
             {
@@ -47,7 +44,7 @@ def sentiment_analysis(text: str) -> dict[str, list[dict[str,str]]]:
                 'sentiment': 'Nötr'
             }
         ]
-    }
+    }'''
 
 slash = '/' if os.name != 'nt' else '\\'
 
@@ -64,7 +61,6 @@ class SentimentResponseModel(BaseModel, JSONResponse):
     results: list[dict[str, str]] = Field(..., example=[
         {'entity': 'Turkcell', 'sentiment': 'Olumlu'},
         {'entity': 'TurkTelekom', 'sentiment': 'Olumsuz'},
-        {'entity': 'Bilişim Vadisi', 'sentiment': 'Nötr'}
     ])
 
 @app.post('/predict', response_model=SentimentResponseModel, summary="Predict sentiment for a given text. (For just backend usage.)", description="Accepts a JSON payload with a `text` field and returns sentiment analysis results.")
@@ -80,7 +76,7 @@ async def predict(request: Request):
             })
 
         result: dict[str, list[dict[str, str]]] = sentiment_analysis(_input.get('text'))
-
+        print(result)
         is_passed: bool = save_prompt_to_db(_input.get('text'), result)
         if not is_passed:
             print('Cannot save datas to database.')
@@ -88,10 +84,11 @@ async def predict(request: Request):
         return JSONResponse(status_code=200, content=result)
 
     except Exception as e:
-        return JSONResponse(status_code=500, detail=str(e))
+        return JSONResponse(status_code=500, content=str(e))
 
 async def result_predict(text: str) -> dict[str, list[dict[str, str]]]:
     result = sentiment_analysis(text)
+    print(result)
     is_passed: bool = save_prompt_to_db(text, result)
 
     if not is_passed:
@@ -103,6 +100,7 @@ async def result_predict(text: str) -> dict[str, list[dict[str, str]]]:
 async def read_result(request: Request, text: str = Form(...)):
     try:
         results = sentiment_analysis(text)['results']
+        print(results)
         return templates.TemplateResponse("result.html", {
             "request": request,
             "text": text,
