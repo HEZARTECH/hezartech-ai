@@ -36,6 +36,21 @@
         .form-container {
             transition: height 0.2s, padding 0.2s;
         }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            border: 1px solid black;
+            padding: 8px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
     </style>
 </head>
 <body>
@@ -54,7 +69,7 @@
                                 style="background-color: gray; font-size: 20px;"
                                 class="poppins-regular cursor-pointer border-1 border-transparent text-center text-gray-300 text-white px-3 py-2 rounded-md text-sm font-medium">
                                 HEZARTECH.AI DOĞAL DİL İŞLEME MODELI
-                            </a>2
+                            </a>
                         </div>
                     </div>
                 </div>
@@ -63,16 +78,70 @@
     </nav>
 </header>
 <article>
-    <div class="bg-white p-8 rounded shadow-md w-full max-w-md">
+    <div class="bg-white p-8 rounded shadow-md w-full max-w-md" style="
+        position: absolute;
+        left: 35%;
+        top: 20%;
+        width: 50vw;
+        ">
         <h2 class="text-2xl mb-6 text-center">Girdiğin:</h2>
-        <p class="text-lg text-gray-800 whitespace-pre-line">{{ text }}</p>
+        <p class="poppins-regular"
+        style="
+            font-size: 15px;
+            border: 1px solid black; border-radius: 10px;
+            padding: 10px;
+        "
+        class="text-lg text-gray-800 whitespace-pre-line">
+            {{ text }}
+        </p>
+
+        <h2 style="margin-top: 20px;" class="text-2xl mb-6 text-center">Sonuç:</h2>
+
+        <div class="mt-6">
+            <table style="border: 1px solid black; border-radius: 20px;">
+                <thead>
+                    <th>Entity</th>
+                    <th>Sentiment</th>
+                </thead>
+                <tbody>
+                    {% for result in results %}
+                    <tr>
+                        <td>{{ result.entity }}</td>
+                        <td>{{ result.sentiment }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
         <div class="mt-6">
             <a href="/" class="block text-center py-2 px-4 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500">
                 &larr; Ana sayfaya git.
             </a>
         </div>
+
     </div>
 </article>
 </section>
+<script>
+    const tdElements = document.querySelectorAll('td');
+    const thElements = document.querySelectorAll('th');
+
+    tdElements.forEach(td => {
+        if(td.innerText.toLowerCase() === "olumlu") {
+            td.style.color = 'white';
+            td.style.backgroundColor = 'green';
+        } if(td.innerText.toLocaleLowerCase() === "olumsuz") {
+            td.style.color = 'white';
+            td.style.backgroundColor = 'red';
+        } if (td.innerText.toLocaleLowerCase() === "nötr") {
+            td.style.color = 'white';
+            td.style.backgroundColor = 'gray';
+            td.style.fontWeight = 'bold';
+        } else {
+            td.style.fontWeight = 'bold';
+        }
+    });
+</script>
 </body>
 </html>

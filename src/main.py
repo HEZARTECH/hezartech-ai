@@ -4,13 +4,27 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 
 from pydantic import BaseModel, Field
+"""
+from datetime import datetime, UTC #(for python3.11+)
+"""
 
-from datetime import datetime, UTC
+# For python 3.10
+from datetime import datetime
+from datetime import timezone
+UTC = timezone.utc
+
+
 import certifi
 import os
 import uuid
 
-from typing import Annotated
+'''
+from ai import (
+    analyze_sentences,
+    reset_result_vectors,
+    firm_list, results
+)
+'''
 
 import pymongo as pg
 
@@ -18,7 +32,7 @@ __import__('dotenv').load_dotenv()
 
 def sentiment_analysis(text: str) -> dict[str, list[dict[str,str]]]:
     return {
-        'entity_list': ['Turkcell', 'TurkTelekom'],
+        'entity_list': ['Turkcell', 'TurkTelekom', 'Bilişim Vadisi'],
         'results': [
             {
                 'entity': 'Turkcell',
@@ -27,6 +41,10 @@ def sentiment_analysis(text: str) -> dict[str, list[dict[str,str]]]:
             {
                 'entity': 'TurkTelekom',
                 'sentiment': 'Olumsuz'
+            },
+            {
+                'entity': 'Bilişim Vadisi',
+                'sentiment': 'Nötr'
             }
         ]
     }
@@ -45,7 +63,8 @@ class SentimentResponseModel(BaseModel, JSONResponse):
     entity_list: list[str] = Field(..., example=['Turkcell', 'TurkTelekom'])
     results: list[dict[str, str]] = Field(..., example=[
         {'entity': 'Turkcell', 'sentiment': 'Olumlu'},
-        {'entity': 'TurkTelekom', 'sentiment': 'Olumsuz'}
+        {'entity': 'TurkTelekom', 'sentiment': 'Olumsuz'},
+        {'entity': 'Bilişim Vadisi', 'sentiment': 'Nötr'}
     ])
 
 @app.post('/predict', response_model=SentimentResponseModel, summary="Predict sentiment for a given text. (For just backend usage.)", description="Accepts a JSON payload with a `text` field and returns sentiment analysis results.")
@@ -54,11 +73,11 @@ async def predict(request: Request):
         _input = await request.json()
 
         if "text" not in _input.keys():
-            return {
+            return JSONResponse(status_code=500, content={
                 "success": False,
                 "message": "You don't set ``text`` key for your JSON POST Request.",
                 "status": 500
-            }
+            })
 
         result: dict[str, list[dict[str, str]]] = sentiment_analysis(_input.get('text'))
 
@@ -71,16 +90,25 @@ async def predict(request: Request):
     except Exception as e:
         return JSONResponse(status_code=500, detail=str(e))
 
+async def result_predict(text: str) -> dict[str, list[dict[str, str]]]:
+    result = sentiment_analysis(text)
+    is_passed: bool = save_prompt_to_db(text, result)
+
+    if not is_passed:
+        print('Cannot save datas to database.')
+
+    return result
 
 @app.post('/result', response_class=HTMLResponse, summary="Display the result page.", description="Displays a result page with the provided text from index page form input. Predict the result via our model and print it.")
 async def read_result(request: Request, text: str = Form(...)):
     try:
-        result = sentiment_analysis(text)
+        results = sentiment_analysis(text)['results']
         return templates.TemplateResponse("result.html", {
             "request": request,
             "text": text,
-            "result": result,
+            "results": results,
         })
+
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
