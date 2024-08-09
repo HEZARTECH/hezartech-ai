@@ -1,15 +1,16 @@
 {
     "entity_list": [
+        "Vodafone",
         "BilişimVadisi"
     ],
     "results": [
         {
-            "entity": "BilişimVadisi",
-            "sentiment": "Olumlu"
+            "entity": "Vodafone",
+            "sentiment": "olumlu"
         },
         {
             "entity": "BilişimVadisi",
-            "sentiment": "Olumsuz"
+            "sentiment": "olumlu"
         }
     ]
 }

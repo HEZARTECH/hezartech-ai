@@ -18,6 +18,8 @@ from collections import OrderedDict
 import json
 
 from typing import Any
+import time
+
 
 # Noktalama işaretleri tokenizer fonksiyonlarının import edildiğinden emin oluyoruz.
 from nltk.tokenize import sent_tokenize, word_tokenize
@@ -191,14 +193,14 @@ def sentiment_analyzer(sentence_i: str, firm: str):
     sentiment = sentiment_result[0]['label']
 
     if sentiment == "LABEL_1":
-        results.append({"entity": firm, "sentiment": "Olumlu"})
+        results.append({"entity": firm, "sentiment": "olumlu"})
     elif sentiment == "LABEL_0":
-        results.append({"entity": firm, "sentiment": "Nötr"})
+        results.append({"entity": firm, "sentiment": "nötr"})
     elif sentiment == "LABEL_2":
-        results.append({"entity": firm, "sentiment": "Olumsuz"})
+        results.append({"entity": firm, "sentiment": "olumsuz"})
     elif sentiment == "LABEL_3":
-        results.append({"entity": firm, "sentiment": "Olumlu"})
-        results.append({"entity": firm, "sentiment": "Olumsuz"})
+        results.append({"entity": firm, "sentiment": "olumlu"})
+        results.append({"entity": firm, "sentiment": "olumsuz"})
 
     return sentiment
 
@@ -210,12 +212,13 @@ def analyze_sentences(sentences: list[str], text: str):
         sentences: list[str] (split_sentences(text) 'a denk geliyor)
 
     """
-
     firm_list = []
+
     global inside_sentences
     pattern = r'@(\w+(\_\w+)*)'
     matches = re.findall(pattern, text)
-    result = [match[0] for match in matches]
+    result = [_match[0] for _match in matches]
+
     dandan.append(result)
     for i in dandan:
         for j in i:
@@ -288,7 +291,14 @@ def analyze_sentences(sentences: list[str], text: str):
     unique_results = list(OrderedDict.fromkeys(tuple(sorted(d.items())) for d in results))
     unique_dict_results = [dict(t) for t in unique_results]
 
-    response = {"entity_list": firm_list, "results": unique_dict_results}
+    firm_vars = []
+
+    for dictionary in unique_dict_results:
+        firm_vars.append(dictionary['entity'])
+
+    firm_vars = list(set(firm_vars))
+
+    response = {"entity_list": firm_vars, "results": unique_dict_results}
     firm_list = []
     reset_result_vectors()
 
@@ -310,6 +320,8 @@ def make_predict(text: str) -> dict[str, Any]:
         Example:
         >>> make_predict('Turcell çok iyi bir şirket. İyi ki varsın @Turkcell.')
     """
+    reset_result_vectors()
+    time.sleep(1)
     return analyze_sentences(split_sentences(text), text)
 
 if __name__ == '__main__':

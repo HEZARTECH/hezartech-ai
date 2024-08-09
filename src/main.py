@@ -63,15 +63,16 @@ class SentimentResponseModel(BaseModel, JSONResponse):
         {'entity': 'TurkTelekom', 'sentiment': 'Olumsuz'},
     ])
 
+'''
 @app.post('/predict', response_model=SentimentResponseModel, summary="Predict sentiment for a given text. (For just backend usage.)", description="Accepts a JSON payload with a `text` field and returns sentiment analysis results.")
 async def predict(request: Request):
-    '''
+    \'''
         Bu fonksiyon cURL ya da herhangi bir client ile bağlanıp verileri
         json formatında isteyip döndürmek için kullanılıyor.
 
         Usage:
             curl http://HOST:PORT/predict -H Content-Type:application/json -d "{\"text\": \"$INPUT$\"}
-    '''
+    \'''
 
     try:
         _input = await request.json()
@@ -93,6 +94,7 @@ async def predict(request: Request):
 
     except Exception as e:
         return JSONResponse(status_code=500, content=str(e))
+'''
 
 async def result_predict(text: str) -> dict[str, list[dict[str, str]]]:
     '''
@@ -164,4 +166,4 @@ def save_prompt_to_db(_input: str, _response: dict[str, list[dict[str, str]]]) -
 
 if __name__ == '__main__':
     import uvicorn
-    uvicorn.run("main:app", host='0.0.0.0', port=1453, reload=True)
+    uvicorn.run("main:app", host='0.0.0.0', port=9568, reload=True)
