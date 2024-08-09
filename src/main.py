@@ -47,7 +47,7 @@ class SentimentResponseModel(BaseModel, JSONResponse):
         {'entity': 'TurkTelekom', 'sentiment': 'Olumsuz'},
     ])
 
-'''
+
 @app.post('/predict', response_model=SentimentResponseModel, summary="Predict sentiment for a given text. (For just backend usage.)", description="Accepts a JSON payload with a `text` field and returns sentiment analysis results.")
 async def predict(request: Request):
     \'''
@@ -78,7 +78,6 @@ async def predict(request: Request):
 
     except Exception as e:
         return JSONResponse(status_code=500, content=str(e))
-'''
 
 async def result_predict(text: str) -> dict[str, list[dict[str, str]]]:
     '''
