@@ -6,6 +6,10 @@
         {
             "entity": "Turkcell",
             "sentiment": "olumlu"
+        },
+        {
+            "entity": "Turkcell",
+            "sentiment": "olumsuz"
         }
     ]
 }
