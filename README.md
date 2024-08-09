@@ -18,7 +18,7 @@ https://huggingface.co/hezartech/hezartech-ai-teknofest-tddi-scenario
 
 ## Project Description
 
-HEZARTECH is a project designed to connect sentiment with firm names in input text. It analyzes the sentiment of the text and associates it with the mentioned firm names, providing valuable insights into public perception and sentiment towards specific companies.
+HEZARTECH is a project designed to connect sentiment with firm names in input text. It analyzes the sentiment of the text and associates it with the mentioned firm names, providing valuable insights into public perception and sentiment towards specific companies. We made firm detection with Flair (DL-NER Model) and RegEx. Also we finetune BERTurk-128k-cased version with our 80K custom free dataset. And we connect these datas into together with a sentence matcher algorithm (which developed by us).
 
 ## Installation Instructions
 
