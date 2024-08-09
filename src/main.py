@@ -50,13 +50,13 @@ class SentimentResponseModel(BaseModel, JSONResponse):
 
 @app.post('/predict', response_model=SentimentResponseModel, summary="Predict sentiment for a given text. (For just backend usage.)", description="Accepts a JSON payload with a `text` field and returns sentiment analysis results.")
 async def predict(request: Request):
-    \'''
+    '''
         Bu fonksiyon cURL ya da herhangi bir client ile bağlanıp verileri
         json formatında isteyip döndürmek için kullanılıyor.
 
         Usage:
             curl http://HOST:PORT/predict -H Content-Type:application/json -d "{\"text\": \"$INPUT$\"}
-    \'''
+    '''
 
     try:
         _input = await request.json()
