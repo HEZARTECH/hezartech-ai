@@ -28,23 +28,7 @@ __import__('dotenv').load_dotenv()
 
 def sentiment_analysis(text: str) -> dict[str, list[dict[str,str]]]:
     return make_predict(text)
-    '''{
-        'entity_list': ['Turkcell', 'TurkTelekom', 'Bilişim Vadisi'],
-        'results': [
-            {
-                'entity': 'Turkcell',
-                'sentiment': 'Olumlu'
-            },
-            {
-                'entity': 'TurkTelekom',
-                'sentiment': 'Olumsuz'
-            },
-            {
-                'entity': 'Bilişim Vadisi',
-                'sentiment': 'Nötr'
-            }
-        ]
-    }'''
+
 
 slash = '/' if os.name != 'nt' else '\\'
 
