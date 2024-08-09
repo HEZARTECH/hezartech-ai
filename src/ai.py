@@ -29,7 +29,7 @@ import nltk; nltk.download('punkt', quiet=True)
 ner_recognizer = SequenceTagger.load('flair/ner-english-large')
 
 # Duygu analizi için Huggingface transformers modeli yükleme
-data_path = '..\model\hezartech-ai-teknofest-tddi-scenario'
+data_path = 'hezartech/hezartech-ai-teknofest-tddi-scenario'
 
 # Model ve tokenizer'ı yükle.
 loaded_model = BertForSequenceClassification.from_pretrained(data_path)
