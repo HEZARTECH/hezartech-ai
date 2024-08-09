@@ -3,7 +3,7 @@
 # HEZARTECH-AI ~ Teknofest Türkçe Doğal Dil İşleme
 
 A natural language processing (NLP) project created via Python. (for Teknofest).
-We attend with scenario type competetion.
+We attend with scenario type competetion. (Model link: https://huggingface.co/hezartech/hezartech-ai-teknofest-tddi-scenario)
 
 ## Table of Contents
 1. [Project Description](#project-description)
